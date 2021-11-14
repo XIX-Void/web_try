@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src=scripts/snow.js></script>
+        <link href="styles/snow.css" rel="stylesheet">
+        <title>测试雪花效果</title>
+    </head>
+    <body>
+        <p></p>
+        <img src="images/snow.jfif" alt="我的测试页面">
+        <div id=dialog>
+            <div id=inputs>
+                <label for=stickingRatio>Sticking:</label>
+                <input type=range id=stickingRatio>
+                <label for=wind>Wind:</label>
+                <input type=range id=wind>
+                <label for=count>Flake Count:</label>
+                <input type=range min=5 max=100 id=count>
+                <label for=radius>Flake Size:</label>
+                <input type=range id=radius>
+            </div>
+            <div>
+                <pre id=preview></pre>
+                <div id=dialog-buttons>
+                    <button id=ok>Execute</button>
+                    <button id=cancel>Cancel</button>
+                </div>
+            </div>
+        </div>
+        <p id=message></p>
+        <script>
+            snow.start({
+                maxRadius: 8,
+                flakeCount: 600,
+                stickingRatio: 1.5,
+                wind: -8
+            });
+    
+            var	messageTimer,
+                gid = document.getElementById.bind(document),
+                start = gid("start"),
+                stop = gid("stop"),
+                message = gid("message"),
+                buttons = gid("buttons"),
+                dialog = gid("dialog");
+    
+            function tell(txt){
+                clearTimeout(messageTimer);
+                message.textContent = txt;
+                messageTimer = setTimeout(function(){
+                    message.textContent = "";
+                }, 15000);
+            }
+    
+            stop.onclick = function(){
+                this.disabled = true;
+                snow.stop();
+                tell("Snow progressively stops falling");
+            }
+    
+            function makeOptions(){
+                var options = {};
+                options.stickingRatio = +(gid("stickingRatio").value/50).toFixed(1);
+                options.wind = Math.round(gid("wind").value/5-10);
+                options.flakeCount = Math.round(Math.pow(gid("count").value, 1.8495));
+                options.maxRadius = +(gid("radius").value/30+1.2).toFixed(1);
+                return options;
+            }
+    
+            function fillPreview(){
+                gid("preview").innerHTML = "snow.start(" + JSON.stringify(makeOptions(), null, "\t") + ");";
+            }
+    
+            [].forEach.call(document.querySelectorAll("input"), function(input){
+                input.onchange = fillPreview;
+            });
+    
+            start.onclick = function(){
+                dialog.style.display = "flex";
+                buttons.style.display = "none";
+            }
+    
+            cancel.onclick = function(){
+                dialog.style.display = "none";
+                buttons.style.display = "flex";
+            }
+    
+            ok.onclick = function(){
+                dialog.style.display = "none";
+                buttons.style.display = "flex";
+                stop.disabled = false;
+                snow.start(makeOptions());
+                message.textContent = "";
+            }
+    
+            fillPreview();
+        </script>
+    </body>
+</html>
